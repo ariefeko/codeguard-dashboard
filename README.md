@@ -31,6 +31,26 @@ Each destination has a stable URL, so active state, direct links, and browser re
 
 All pages currently use placeholders. The temporary user role is set to `admin` so every route can be inspected during skeleton development.
 
+## Authentication
+
+Public routes:
+
+```text
+/login
+/register
+```
+
+Dashboard routes are protected and redirect unauthenticated visitors to `/login`. Successful login or registration opens the Overview page. The sidebar user card displays the active user and provides a logout action.
+
+The current authentication flow is a **frontend demo boundary**:
+
+- Any valid email and password with at least 8 characters can sign in.
+- Registration validates name, email, password length, and password confirmation.
+- Only the demo user profile is stored in browser `localStorage`; passwords are never stored.
+- The demo user receives the `admin` role so all skeleton routes remain visible.
+
+This is not production authentication. It must be replaced with backend identity verification, secure server-side sessions or tokens, authorization checks, rate limiting, and account lifecycle flows when the API foundation is implemented.
+
 ## Tech Stack
 
 - React 19
@@ -288,6 +308,7 @@ The task document is the source of truth for implementation status. Update its `
 
 ```text
 [x] F01 — Scalable Application Skeleton
+[x] F10 — Authentication UI Skeleton
 [x] I01 — Frontend Containerization
 [ ] F02 — UI Foundation
 [ ] B01 — API Foundation

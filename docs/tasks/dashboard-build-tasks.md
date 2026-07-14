@@ -16,6 +16,7 @@ This document is the source of truth for the CodeGuard Dashboard implementation 
 
 ```text
 [x] F01 — Scalable Application Skeleton
+[x] F10 — Authentication UI Skeleton
 [x] I01 — Frontend Containerization
 [ ] F02 — UI Foundation
 [ ] B01 — API Foundation
@@ -176,6 +177,30 @@ Definition of done:
 - Critical accessibility issues are resolved
 
 Depends on: `F03`–`F08`
+
+### [x] F10 — Authentication UI Skeleton
+
+Scope:
+
+- Add public login and registration routes
+- Add a replaceable client authentication provider
+- Protect dashboard routes and redirect unauthenticated users
+- Persist a demo user profile without storing passwords
+- Add logout and active-user identity to the dashboard shell
+- Add responsive authentication screens and client validation
+
+Definition of done:
+
+- Unauthenticated visitors are redirected to `/login`
+- Login and registration create a demo session and open the dashboard
+- Authenticated users cannot reopen the public authentication screens
+- Logout clears the demo session and returns to login
+- Password values are never persisted
+- TypeScript checks and the production build pass
+
+Depends on: `F01`
+
+Production dependency: `B01` must replace the demo session with real identity verification, secure session management, and server-side authorization.
 
 ---
 

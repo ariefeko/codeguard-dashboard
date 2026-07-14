@@ -404,7 +404,11 @@ API / Worker
 ## Dashboard Pages
 
 ```text
-Dashboard
+Public
+├── Login
+└── Register
+
+Protected Dashboard
 ├── Overview
 ├── Projects
 │   └── Project Detail
@@ -428,6 +432,16 @@ Dashboard
     ├── Telemetry
     └── Obsidian Export
 ```
+
+### Authentication Boundary
+
+```text
+Unauthenticated request → Login / Register
+Authenticated session   → Protected Dashboard
+Logout                  → Clear session → Login
+```
+
+The current frontend skeleton uses browser storage for a demo user profile and does not store passwords. This boundary exists to validate routing and user experience only. Production authentication requires backend credential verification, secure session management, server-side authorization, rate limiting, and account recovery flows.
 
 The regular-user sidebar displays only five primary menu items:
 
