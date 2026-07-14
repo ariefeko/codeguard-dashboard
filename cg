@@ -1,0 +1,106 @@
+#!/usr/bin/env sh
+
+set -eu
+
+SCRIPT_PATH=$0
+
+while [ -L "$SCRIPT_PATH" ]; do
+  LINK_DIR=$(CDPATH= cd -P -- "$(dirname -- "$SCRIPT_PATH")" && pwd)
+  LINK_TARGET=$(readlink "$SCRIPT_PATH")
+
+  case "$LINK_TARGET" in
+    /*) SCRIPT_PATH=$LINK_TARGET ;;
+    *) SCRIPT_PATH=$LINK_DIR/$LINK_TARGET ;;
+  esac
+done
+
+SCRIPT_DIR=$(CDPATH= cd -P -- "$(dirname -- "$SCRIPT_PATH")" && pwd)
+cd "$SCRIPT_DIR"
+
+print_help() {
+  cat <<'EOF'
+CodeGuard development CLI
+
+Usage:
+  cg <command> [arguments]
+
+Development:
+  up [options]           Start the Vite development container
+  stop                   Stop the development container
+  restart                Restart the development container
+  logs                   Follow development-container logs
+  shell                  Open a disposable development shell
+  npm <arguments>        Run npm in Node.js 24
+  npx <arguments>        Run npx in Node.js 24
+  node <arguments>       Run Node.js 24
+
+Production:
+  prod [options]         Build and start the Nginx production container
+  down                   Stop and remove CodeGuard containers
+  ps                     Show container status
+  image                  Build the production image
+
+Advanced:
+  compose <arguments>    Pass arguments directly to Docker Compose
+  help                   Show this help
+
+Examples:
+  cg up -d
+  cg npm install
+  cg npm install axios
+  cg npm run typecheck
+  cg npm run build
+  cg shell
+  cg prod -d
+EOF
+}
+
+command=${1:-help}
+
+case "$command" in
+  up)
+    shift
+    docker compose --profile dev up "$@" dev
+    ;;
+  stop)
+    docker compose --profile dev stop dev
+    ;;
+  restart)
+    docker compose --profile dev restart dev
+    ;;
+  logs)
+    docker compose --profile dev logs --follow dev
+    ;;
+  shell)
+    docker compose --profile dev run --rm dev sh
+    ;;
+  npm|npx|node)
+    shift
+    docker compose --profile dev run --rm dev "$command" "$@"
+    ;;
+  prod)
+    shift
+    docker compose up --build "$@" dashboard
+    ;;
+  image)
+    docker compose build dashboard
+    ;;
+  down)
+    docker compose --profile dev down
+    ;;
+  ps)
+    docker compose --profile dev ps
+    ;;
+  compose)
+    shift
+    docker compose "$@"
+    ;;
+  help|-h|--help)
+    print_help
+    ;;
+  *)
+    printf 'Unknown command: %s\n\n' "$command" >&2
+    print_help >&2
+    exit 1
+    ;;
+esac

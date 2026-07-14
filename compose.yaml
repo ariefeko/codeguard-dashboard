@@ -1,0 +1,37 @@
+services:
+  dev:
+    profiles: ["dev"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    init: true
+    working_dir: /app
+    ports:
+      - "${CODEGUARD_DEV_PORT:-5173}:5173"
+    volumes:
+      - .:/app
+      - codeguard_node_modules:/app/node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "${CHOKIDAR_USEPOLLING:-false}"
+    stdin_open: true
+    tty: true
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: codeguard-dashboard:local
+    ports:
+      - "${CODEGUARD_PORT:-8080}:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+
+volumes:
+  codeguard_node_modules:
