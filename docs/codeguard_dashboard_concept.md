@@ -439,7 +439,25 @@ Issues
 Settings
 ```
 
-`System Health` is displayed conditionally for administrator and operator roles. Subsections such as PR Reviews, Sentry Incidents, and Issue states are displayed as page tabs to keep the sidebar compact. Resolutions are part of Issue history and filtering rather than a separate menu item.
+`System Health` is displayed conditionally for administrator and operator roles. Subsections are shown both as nested sidebar links and as route-aware page tabs. Resolutions are part of Issue history and filtering rather than a separate menu item.
+
+Subsection routes:
+
+```text
+/analyses/pr-reviews
+/analyses/sentry-incidents
+/issues/open
+/issues/resolved
+/issues/ignored
+/system-health/jobs
+/system-health/llm-usage
+/system-health/observability
+/settings/github
+/settings/sentry
+/settings/ai-rag
+/settings/telemetry
+/settings/obsidian
+```
 
 Primary user flow:
 

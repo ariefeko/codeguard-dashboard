@@ -18,6 +18,17 @@ Additional navigation for administrators and operators:
 
 - **System Health** — Jobs, LLM Usage, and business observability events
 
+Sections with multiple workflows expose the same destinations as collapsible nested sidebar items and route-aware page tabs:
+
+```text
+Analyses       → PR Reviews / Sentry Incidents
+Issues         → Open / Resolved / Ignored
+System Health  → Jobs / LLM Usage / Observability
+Settings       → GitHub / Sentry / AI & RAG / Telemetry / Obsidian
+```
+
+Each destination has a stable URL, so active state, direct links, and browser refreshes remain consistent.
+
 All pages currently use placeholders. The temporary user role is set to `admin` so every route can be inspected during skeleton development.
 
 ## Tech Stack

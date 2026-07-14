@@ -33,13 +33,14 @@ Scope:
 - Establish a feature-based directory structure
 - Configure TanStack Router and Query providers
 - Build the application shell and responsive sidebar
-- Add centralized, role-aware navigation configuration
-- Add route-level placeholder pages
+- Add centralized, role-aware nested navigation configuration
+- Add route-level placeholder pages and route-aware tabs
 
 Definition of done:
 
 - The application runs locally
 - Every primary route is accessible
+- Every submenu has a stable URL and synchronized sidebar/tab active state
 - Administrator navigation can be filtered by role
 - TypeScript checks and the production build pass
 
