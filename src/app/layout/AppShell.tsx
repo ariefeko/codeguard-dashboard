@@ -1,21 +1,25 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { ChevronDown, Menu, PanelLeftClose, ShieldCheck, X } from "lucide-react";
+import { ChevronDown, LogOut, Menu, ShieldCheck, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   getNavigationForRole,
-  type UserRole,
 } from "../navigation/navigation";
-
-const currentUserRole: UserRole = "admin";
+import { useAuth } from "../../features/auth/model/AuthProvider";
 
 function getSectionPath(pathname: string) {
   return pathname.split("/").slice(0, 2).join("/") || "/";
 }
 
 export function AppShell() {
+  const { user, signOut } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const navigation = getNavigationForRole(currentUserRole);
+  const navigation = getNavigationForRole(user?.role ?? "member");
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const initials = user?.name
+    .split(" ")
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("") || "CG";
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     () => new Set([getSectionPath(pathname)]),
   );
@@ -127,12 +131,14 @@ export function AppShell() {
         </nav>
 
         <div className="sidebar__footer">
-          <div className="avatar">AE</div>
+          <div className="avatar">{initials}</div>
           <div>
-            <strong>Arief Eko</strong>
-            <small>{currentUserRole}</small>
+            <strong>{user?.name ?? "CodeGuard User"}</strong>
+            <small>{user?.role ?? "member"}</small>
           </div>
-          <PanelLeftClose size={17} aria-hidden="true" />
+          <button className="sidebar__logout" type="button" onClick={signOut} aria-label="Sign out" title="Sign out">
+            <LogOut size={16} />
+          </button>
         </div>
       </aside>
 

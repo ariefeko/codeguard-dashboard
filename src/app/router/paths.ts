@@ -1,5 +1,7 @@
 export type AppPath =
   | "/"
+  | "/login"
+  | "/register"
   | "/projects"
   | "/analyses"
   | "/analyses/pr-reviews"
