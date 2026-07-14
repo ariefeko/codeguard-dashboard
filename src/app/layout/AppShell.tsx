@@ -1,6 +1,6 @@
-import { Link, Outlet } from "@tanstack/react-router";
-import { Menu, PanelLeftClose, ShieldCheck, X } from "lucide-react";
-import { useState } from "react";
+import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { ChevronDown, Menu, PanelLeftClose, ShieldCheck, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   getNavigationForRole,
   type UserRole,
@@ -8,9 +8,45 @@ import {
 
 const currentUserRole: UserRole = "admin";
 
+function getSectionPath(pathname: string) {
+  return pathname.split("/").slice(0, 2).join("/") || "/";
+}
+
 export function AppShell() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const navigation = getNavigationForRole(currentUserRole);
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    () => new Set([getSectionPath(pathname)]),
+  );
+
+  useEffect(() => {
+    const activeSection = getSectionPath(pathname);
+
+    setExpandedSections((current) => {
+      if (current.has(activeSection)) {
+        return current;
+      }
+
+      const next = new Set(current);
+      next.add(activeSection);
+      return next;
+    });
+  }, [pathname]);
+
+  function toggleSection(sectionPath: string) {
+    setExpandedSections((current) => {
+      const next = new Set(current);
+
+      if (next.has(sectionPath)) {
+        next.delete(sectionPath);
+      } else {
+        next.add(sectionPath);
+      }
+
+      return next;
+    });
+  }
 
   return (
     <div className="app-shell">
@@ -32,19 +68,62 @@ export function AppShell() {
 
         <nav className="navigation" aria-label="Primary navigation">
           <span className="navigation__label">Workspace</span>
-          {navigation.map(({ label, to, icon: Icon }) => (
-            <Link
-              key={to}
-              to={to}
-              activeOptions={{ exact: to === "/" }}
-              activeProps={{ className: "navigation__item navigation__item--active" }}
-              inactiveProps={{ className: "navigation__item" }}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <Icon size={18} />
-              <span>{label}</span>
-            </Link>
-          ))}
+          {navigation.map(({ label, to, icon: Icon, children }) => {
+            const sectionPath = getSectionPath(to);
+            const isSectionActive = to === "/"
+              ? pathname === "/"
+              : pathname === sectionPath || pathname.startsWith(`${sectionPath}/`);
+            const isExpanded = expandedSections.has(sectionPath);
+
+            return (
+              <div className="navigation__group" key={to}>
+                {children ? (
+                  <button
+                    type="button"
+                    className={`navigation__item navigation__item--button ${isSectionActive ? "navigation__item--active" : ""}`}
+                    onClick={() => toggleSection(sectionPath)}
+                    aria-expanded={isExpanded}
+                    aria-controls={`navigation-${sectionPath.slice(1)}`}
+                  >
+                    <Icon size={18} />
+                    <span className="navigation__item-label">{label}</span>
+                    <ChevronDown
+                      className={`navigation__chevron ${isExpanded ? "navigation__chevron--expanded" : ""}`}
+                      size={15}
+                    />
+                  </button>
+                ) : (
+                  <Link
+                    to={to}
+                    className={`navigation__item ${isSectionActive ? "navigation__item--active" : ""}`}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <Icon size={18} />
+                    <span>{label}</span>
+                  </Link>
+                )}
+                {children && (
+                  <div
+                    className={`navigation__subitems ${isExpanded ? "navigation__subitems--expanded" : ""}`}
+                    id={`navigation-${sectionPath.slice(1)}`}
+                    aria-hidden={!isExpanded}
+                  >
+                    {children.map((child) => (
+                      <Link
+                        key={child.to}
+                        to={child.to}
+                        className={`navigation__subitem ${pathname === child.to ? "navigation__subitem--active" : ""}`}
+                        onClick={() => setSidebarOpen(false)}
+                      >
+                        <span className="navigation__subitem-marker" />
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         <div className="sidebar__footer">

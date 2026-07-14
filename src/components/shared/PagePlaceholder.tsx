@@ -1,11 +1,13 @@
+import { Link, useRouterState } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
+import type { AppTab } from "../../app/router/paths";
 
 interface PagePlaceholderProps {
   eyebrow: string;
   title: string;
   description: string;
   icon: LucideIcon;
-  tabs?: string[];
+  tabs?: AppTab[];
 }
 
 export function PagePlaceholder({
@@ -15,6 +17,8 @@ export function PagePlaceholder({
   icon: Icon,
   tabs,
 }: PagePlaceholderProps) {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
   return (
     <section className="page">
       <header className="page-header">
@@ -28,17 +32,21 @@ export function PagePlaceholder({
 
       {tabs && (
         <div className="tabs" role="tablist" aria-label={`${title} views`}>
-          {tabs.map((tab, index) => (
-            <button
-              key={tab}
-              className={`tab ${index === 0 ? "tab--active" : ""}`}
-              role="tab"
-              aria-selected={index === 0}
-              type="button"
-            >
-              {tab}
-            </button>
-          ))}
+          {tabs.map((tab) => {
+            const isActive = pathname === tab.to;
+
+            return (
+              <Link
+                key={tab.to}
+                to={tab.to}
+                className={`tab ${isActive ? "tab--active" : ""}`}
+                role="tab"
+                aria-selected={isActive}
+              >
+                {tab.label}
+              </Link>
+            );
+          })}
         </div>
       )}
 
